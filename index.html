@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiempos Libres Habituales | Detector de Disponibilidad</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">
+                    <i data-lucide="calendar-heart"></i>
+                </div>
+                <div>
+                    <h1>HabitualFree</h1>
+                    <p class="subtitle">Detector Inteligente de Tiempos Libres Habituales</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="btn-sample-data" class="btn btn-secondary">
+                    <i data-lucide="sparkles"></i> Cargar CSV de Ejemplo
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Grid: File Upload & Configuration -->
+            <div class="grid-2col">
+                <!-- CSV Upload Card -->
+                <section class="card upload-card">
+                    <div class="card-header">
+                        <i data-lucide="upload-cloud"></i>
+                        <h2>Cargar Archivo CSV</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="drop-zone" class="drop-zone">
+                            <i data-lucide="file-spreadsheet" class="drop-icon"></i>
+                            <p class="drop-title">Arrastra tu archivo CSV aquí</p>
+                            <p class="drop-subtitle">o haz clic para examinar tus archivos</p>
+                            <input type="file" id="file-input" accept=".csv" class="file-input">
+                            <span class="file-hint">Soporta formatos Google Calendar, Outlook o CSV estándar con columnas de Fecha/Hora inicio y fin</span>
+                        </div>
+                        <div id="file-info" class="file-info hidden">
+                            <div class="file-details">
+                                <i data-lucide="file-check"></i>
+                                <span id="file-name">archivo.csv</span>
+                                <span id="file-size" class="badge">0 KB</span>
+                            </div>
+                            <button id="btn-remove-file" class="btn-icon" title="Eliminar archivo">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Model Configuration Card -->
+                <section class="card config-card">
+                    <div class="card-header">
+                        <i data-lucide="sliders"></i>
+                        <h2>Configuración del Modelo</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="config-form" class="config-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="work-start">Hora Inicio Jornada:</label>
+                                    <input type="time" id="work-start" value="08:00" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="work-end">Hora Fin Jornada:</label>
+                                    <input type="time" id="work-end" value="18:00" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="slot-duration">Duración de Bloque:</label>
+                                    <select id="slot-duration" class="form-control">
+                                        <option value="30">30 Minutos</option>
+                                        <option value="60" selected>60 Minutos (1 Hora)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="habit-threshold">Umbral de Hábito Libre (%):</label>
+                                    <div class="range-container">
+                                        <input type="range" id="habit-threshold" min="50" max="100" value="70" class="range-control">
+                                        <span id="threshold-value" class="range-badge">70%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Días a Analizar:</label>
+                                <div class="days-selector">
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="1" checked> Lun</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="2" checked> Mar</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="3" checked> Mié</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="4" checked> Jue</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="5" checked> Vie</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="6"> Sáb</label>
+                                    <label class="day-checkbox"><input type="checkbox" name="days" value="0"> Dom</label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Summary Dashboard Stats -->
+            <section id="summary-section" class="summary-section hidden">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon primary"><i data-lucide="calendar"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="stat-weeks-count">0</span>
+                            <span class="metric-label">Semanas Analizadas</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon info"><i data-lucide="check-square"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="stat-appointments-count">0</span>
+                            <span class="metric-label">Citas Procesadas</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon success"><i data-lucide="clock"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="stat-habitual-hours">0h</span>
+                            <span class="metric-label">Tiempos Libres Habituales/Semana</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon warning"><i data-lucide="award"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="stat-best-slot">--</span>
+                            <span class="metric-label">Horario Más Consistente</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="results-section hidden">
+                <!-- Top Habitual Slots & Heatmap Dual View -->
+                <div class="results-tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-tab="tab-recommendations">
+                            <i data-lucide="star"></i> Tiempos Libres Recomendados
+                        </button>
+                        <button class="tab-btn" data-tab="tab-heatmap">
+                            <i data-lucide="grid"></i> Mapa de Calor Semanal
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Top Habitual Free Time Recommendations -->
+                    <div id="tab-recommendations" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header flex-between">
+                                <div>
+                                    <h2>Patrones de Disponibilidad Recurrente</h2>
+                                    <p class="text-muted">Horarios que habitualmente están libres según el modelo estadístico de probabilidad acumulada.</p>
+                                </div>
+                                <div class="export-actions">
+                                    <button id="btn-export-csv" class="btn btn-outline btn-sm">
+                                        <i data-lucide="download"></i> Exportar CSV
+                                    </button>
+                                    <button id="btn-export-ics" class="btn btn-outline btn-sm">
+                                        <i data-lucide="calendar-plus"></i> Exportar a Calendario (.ics)
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="habitual-slots-list" class="habitual-slots-grid">
+                                    <!-- Dynamic cards inserted via app.js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Weekly Heatmap Matrix -->
+                    <div id="tab-heatmap" class="tab-content">
+                        <div class="card">
+                            <div class="card-header flex-between">
+                                <div>
+                                    <h2>Matriz de Probabilidad de Tiempo Libre</h2>
+                                    <p class="text-muted">Porcentaje de semanas en que la franja horaria se encontró 100% desocupada.</p>
+                                </div>
+                                <div class="heatmap-legend">
+                                    <span class="legend-item"><span class="legend-color level-0"></span> &lt; 30% Libre</span>
+                                    <span class="legend-item"><span class="legend-color level-1"></span> 30-60%</span>
+                                    <span class="legend-item"><span class="legend-color level-2"></span> 60-80%</span>
+                                    <span class="legend-item"><span class="legend-color level-3"></span> &gt; 80% Libre</span>
+                                </div>
+                            </div>
+                            <div class="card-body overflow-x">
+                                <div id="heatmap-container" class="heatmap-container">
+                                    <!-- Dynamic Heatmap rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Placeholder State when no file loaded -->
+            <section id="empty-state" class="empty-state">
+                <i data-lucide="calendar-range" class="empty-icon"></i>
+                <h3>No hay datos cargados</h3>
+                <p>Carga un archivo CSV con tus citas pasadas o usa el botón <strong>"Cargar CSV de Ejemplo"</strong> para descubrir tus tiempos libres habituales.</p>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
