@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileSizeSpan = document.getElementById('file-size');
     const btnRemoveFile = document.getElementById('btn-remove-file');
     const btnSampleData = document.getElementById('btn-sample-data');
+    const btnDownloadDemo = document.getElementById('btn-download-demo');
     const habitThresholdInput = document.getElementById('habit-threshold');
     const thresholdValueBadge = document.getElementById('threshold-value');
     const configForm = document.getElementById('config-form');
@@ -376,6 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const sampleCSV = generateSampleCSV();
         displayFileInfo('citas_ejemplo_habitual.csv', (sampleCSV.length / 1024).toFixed(1) + ' KB');
         processCSVContent(sampleCSV);
+    });
+
+    btnDownloadDemo.addEventListener('click', () => {
+        const sampleCSV = generateSampleCSV();
+        downloadBlob(sampleCSV, 'citas_demo_pruebas.csv', 'text/csv');
     });
 
     habitThresholdInput.addEventListener('input', (e) => {
